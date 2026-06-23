@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Sebastian Math" />
+  <meta name="theme-color" content="#2563eb" />
+  <title>Sebastian's Math Adventure</title>
+  <link rel="apple-touch-icon" href="images/sebastian.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="stars-bg" aria-hidden="true"></div>
+  <div class="photo-bg" aria-hidden="true"></div>
+
+  <main class="app">
+    <section id="screen-home" class="screen active">
+      <header class="hero">
+        <img src="images/sebastian.png" alt="Sebastian" class="hero-avatar" onerror="this.onerror=null;this.src='images/sebastian.svg'" />
+        <p class="eyebrow">Welcome back,</p>
+        <h1>Sebastian! 🚀</h1>
+        <p class="subtitle">Master math up to 100 — add, subtract, multiply &amp; divide!</p>
+      </header>
+
+      <div class="stats-bar">
+        <div class="stat">
+          <span class="stat-label">Stars</span>
+          <span id="total-stars" class="stat-value">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Best Streak</span>
+          <span id="best-streak" class="stat-value">0</span>
+        </div>
+      </div>
+
+      <div class="menu">
+        <button class="menu-btn practice" data-go="skills">
+          <span class="menu-icon">🎯</span>
+          <span class="menu-text">
+            <strong>Skill Practice</strong>
+            <small>+ − × ÷ up to 100</small>
+          </span>
+        </button>
+        <button class="menu-btn quiz" data-go="quiz">
+          <span class="menu-icon">🚀</span>
+          <span class="menu-text">
+            <strong>Math Quest</strong>
+            <small>10 mixed questions — earn stars!</small>
+          </span>
+        </button>
+      </div>
+
+      <h3 class="games-section-title">🎮 Fun Games</h3>
+      <div class="menu games-menu">
+        <button class="menu-btn bubble" id="start-bubble-btn" type="button">
+          <span class="menu-icon">🫧</span>
+          <span class="menu-text">
+            <strong>Bubble Pop</strong>
+            <small>Pop the bubble with the right answer!</small>
+          </span>
+        </button>
+        <button class="menu-btn rocket-game" id="start-rocket-btn" type="button">
+          <span class="menu-icon">🌙</span>
+          <span class="menu-text">
+            <strong>Rocket to the Moon</strong>
+            <small>Fuel your rocket with math!</small>
+          </span>
+        </button>
+      </div>
+
+      <div class="family-photo-wrap">
+        <img src="images/family.png" alt="Sebastian and family" class="family-photo" />
+        <p class="family-caption">Cheering for Sebastian! 💙</p>
+      </div>
+
+      <div class="home-footer">
+        <button id="sound-toggle" class="sound-toggle" type="button">🔊 Sound & Voice On</button>
+      </div>
+    </section>
+
+    <section id="screen-skills" class="screen">
+      <header class="screen-header">
+        <button class="back-btn" data-go="home">← Back</button>
+        <h2>Pick a Skill</h2>
+      </header>
+      <p class="hint">Start with Addition. Get 8/10 correct to master a skill and unlock the next!</p>
+      <div id="skill-grid" class="skill-grid"></div>
+    </section>
+
+    <section id="screen-play" class="screen">
+      <header class="screen-header">
+        <button class="back-btn" data-go="skills" id="play-back-btn">← Back</button>
+        <h2 id="play-title">Practice</h2>
+      </header>
+
+      <div class="progress-wrap">
+        <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+        <p id="progress-text" class="progress-text">Question 1 of 10</p>
+      </div>
+
+      <div class="streak-badge" id="streak-badge">🔥 Streak: 0</div>
+
+      <div id="star-burst" class="star-burst" aria-hidden="true"></div>
+
+      <div class="question-card" id="question-card">
+        <p class="question-label">What is</p>
+        <p id="question-text" class="question-text">23 + 45 = ?</p>
+        <div id="dot-grid" class="dot-grid" aria-hidden="true"></div>
+      </div>
+
+      <div id="choices" class="choices"></div>
+      <p id="feedback" class="feedback" role="status"></p>
+
+      <button id="next-btn" class="next-btn hidden">Next →</button>
+    </section>
+
+    <section id="screen-results" class="screen">
+      <div class="results-card">
+        <img src="images/sebastian.png" alt="Sebastian" class="results-avatar" onerror="this.onerror=null;this.src='images/sebastian.svg'" />
+        <p class="results-emoji" id="results-emoji">🎉</p>
+        <h2 id="results-title">Amazing, Sebastian!</h2>
+        <p id="results-message">You earned 8 stars!</p>
+        <div class="results-stats">
+          <div><span id="results-correct">8</span><small>Correct</small></div>
+          <div><span id="results-stars">+5</span><small>Stars</small></div>
+        </div>
+        <button class="primary-btn" data-go="home">Back Home</button>
+        <button class="secondary-btn" id="play-again-btn">Play Again</button>
+      </div>
+    </section>
+
+    <section id="screen-bubble" class="screen">
+      <header class="screen-header">
+        <button class="back-btn" data-go="home" id="bubble-back">← Back</button>
+        <h2>Bubble Pop</h2>
+      </header>
+      <div class="lives-bar" id="bubble-lives">❤️ ❤️ ❤️</div>
+      <p class="bubble-prompt">Pop the bubble with the answer!</p>
+      <p id="bubble-question" class="bubble-question">36 ÷ 4 = ?</p>
+      <div id="bubble-arena" class="bubble-arena"></div>
+      <p id="bubble-feedback" class="feedback"></p>
+      <p id="bubble-score" class="bubble-score">Score: 0 / 8</p>
+    </section>
+
+    <section id="screen-rocket" class="screen">
+      <header class="screen-header">
+        <button class="back-btn" data-go="home" id="rocket-back">← Back</button>
+        <h2>Rocket to the Moon</h2>
+      </header>
+      <div class="rocket-hero-wrap">
+        <img src="images/sebastian-astronaut.png" alt="Sebastian ready for launch" class="rocket-hero-photo" onerror="this.style.display='none'" />
+      </div>
+      <div class="rocket-scene">
+        <div class="rocket-track">
+          <div id="rocket-moon" class="rocket-moon">🌙</div>
+          <div id="rocket-ship" class="rocket-ship">🚀</div>
+        </div>
+        <div class="rocket-fuel-wrap">
+          <span>Fuel</span>
+          <div class="rocket-fuel-bar"><div id="rocket-fuel-fill" class="rocket-fuel-fill"></div></div>
+        </div>
+      </div>
+      <p id="rocket-question" class="question-text rocket-q">72 − 28 = ?</p>
+      <div id="rocket-choices" class="choices"></div>
+      <p id="rocket-feedback" class="feedback"></p>
+      <p id="rocket-progress" class="progress-text">Stop 1 of 8</p>
+    </section>
+  </main>
+
+  <div id="confetti" class="confetti" aria-hidden="true"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/sounds.js"></script>
+  <script src="js/custom-manifest.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/minigames.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
