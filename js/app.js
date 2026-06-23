@@ -303,6 +303,7 @@ document.getElementById("music-toggle")?.addEventListener("click", () => {
 
 function unlockAllAudio() {
   Sound.init();
+  Voice.unlock();
   if (progress.musicEnabled) Music.play();
 }
 

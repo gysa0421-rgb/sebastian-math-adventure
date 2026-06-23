@@ -78,14 +78,13 @@ function spawnBubbleBurst(bubble, arena) {
   const cx = bubbleRect.left + bubbleRect.width / 2 - arenaRect.left;
   const cy = bubbleRect.top + bubbleRect.height / 2 - arenaRect.top;
   const size = bubbleRect.width;
-  const screen = document.getElementById("screen-bubble");
 
   const mega = document.createElement("span");
   mega.className = "bubble-mega-burst";
   mega.style.left = `${cx}px`;
   mega.style.top = `${cy}px`;
   arena.appendChild(mega);
-  setTimeout(() => mega.remove(), 900);
+  setTimeout(() => mega.remove(), 700);
 
   const bigCheer = document.createElement("span");
   bigCheer.className = "bubble-celebration mega";
@@ -93,9 +92,9 @@ function spawnBubbleBurst(bubble, arena) {
   bigCheer.style.left = `${cx}px`;
   bigCheer.style.top = `${cy}px`;
   arena.appendChild(bigCheer);
-  setTimeout(() => bigCheer.remove(), 1050);
+  setTimeout(() => bigCheer.remove(), 800);
 
-  for (let r = 0; r < 3; r++) {
+  for (let r = 0; r < 2; r++) {
     const ripple = document.createElement("span");
     ripple.className = "bubble-ripple";
     ripple.style.left = `${cx}px`;
@@ -104,74 +103,37 @@ function spawnBubbleBurst(bubble, arena) {
     ripple.style.height = `${size}px`;
     ripple.style.animationDelay = `${r * 0.06}s`;
     arena.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 950);
+    setTimeout(() => ripple.remove(), 750);
   }
 
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < 10; i++) {
     const spark = document.createElement("span");
     spark.className = "bubble-gold-spark";
-    const angle = (Math.PI * 2 * i) / 16 + randomInt(-10, 10) * 0.01;
-    const dist = randomInt(70, 150);
+    const angle = (Math.PI * 2 * i) / 10;
+    const dist = randomInt(55, 100);
     const rot = (angle * 180) / Math.PI;
     spark.style.left = `${cx}px`;
     spark.style.top = `${cy}px`;
     spark.style.setProperty("--rot", `${rot}deg`);
-    spark.style.setProperty("--len", `${randomInt(14, 32)}px`);
-    spark.style.setProperty("--thick", `${randomInt(3, 5)}px`);
+    spark.style.setProperty("--len", `${randomInt(12, 24)}px`);
+    spark.style.setProperty("--thick", "3px");
     spark.style.setProperty("--dx", `${Math.cos(angle) * dist}px`);
     spark.style.setProperty("--dy", `${Math.sin(angle) * dist}px`);
-    spark.style.animationDelay = `${randomInt(0, 80)}ms`;
     arena.appendChild(spark);
-    setTimeout(() => spark.remove(), 900);
+    setTimeout(() => spark.remove(), 700);
   }
 
-  for (let i = 0; i < 10; i++) {
-    const dot = document.createElement("span");
-    dot.className = "bubble-gold-dot";
-    const angle = randomInt(0, 360) * (Math.PI / 180);
-    const dist = randomInt(45, 120);
-    const dotSize = randomInt(6, 14);
-    dot.style.left = `${cx}px`;
-    dot.style.top = `${cy}px`;
-    dot.style.width = `${dotSize}px`;
-    dot.style.height = `${dotSize}px`;
-    dot.style.setProperty("--dx", `${Math.cos(angle) * dist}px`);
-    dot.style.setProperty("--dy", `${Math.sin(angle) * dist}px`);
-    dot.style.animationDelay = `${randomInt(0, 100)}ms`;
-    arena.appendChild(dot);
-    setTimeout(() => dot.remove(), 850);
-  }
-
-  const celebrationEmojis = ["✨", "⭐", "🌟", "🎉", "🎊"];
-  for (let i = 0; i < 6; i++) {
-    const cheer = document.createElement("span");
-    cheer.className = "bubble-celebration";
-    cheer.textContent = pickRandom(celebrationEmojis);
-    const angle = randomInt(0, 360) * (Math.PI / 180);
-    const dist = randomInt(40, 100);
-    cheer.style.left = `${cx}px`;
-    cheer.style.top = `${cy}px`;
-    cheer.style.setProperty("--dx", `${Math.cos(angle) * dist}px`);
-    cheer.style.setProperty("--dy", `${Math.sin(angle) * dist}px`);
-    cheer.style.animationDelay = `${i * 30}ms`;
-    arena.appendChild(cheer);
-    setTimeout(() => cheer.remove(), 1000);
-  }
-
-  arena.classList.add("burst-flash", "shake");
-  if (screen) screen.classList.add("celebrate");
-  setTimeout(() => {
-    arena.classList.remove("burst-flash", "shake");
-    if (screen) screen.classList.remove("celebrate");
-  }, 650);
+  arena.classList.add("burst-flash");
+  setTimeout(() => arena.classList.remove("burst-flash"), 500);
 
   arena.querySelectorAll(".game-bubble:not(.pop)").forEach((b) => {
+    b.disabled = true;
     b.classList.add("fade-away");
   });
 }
 
 function popBubble(bubble, value, q) {
-  if (bubbleState.locked) return;
+  if (!bubbleState || bubbleState.locked) return;
   bubbleState.locked = true;
 
   const feedback = document.getElementById("bubble-feedback");
@@ -180,7 +142,10 @@ function popBubble(bubble, value, q) {
   if (value === q.answer) {
     bubbleState.correct += 1;
     bubble.classList.add("pop");
-    spawnBubbleBurst(bubble, arena);
+    arena.querySelectorAll(".game-bubble:not(.pop)").forEach((b) => {
+      b.disabled = true;
+    });
+
     const questionEl = document.getElementById("bubble-question");
     questionEl.classList.remove("pop-success");
     void questionEl.offsetWidth;
@@ -189,12 +154,22 @@ function popBubble(bubble, value, q) {
     feedback.className = "feedback bounce happy";
     Sound.playBubblePop();
     Voice.cheerBubblePop();
-    launchConfetti(true, true);
     recordAnswer(loadProgress(), q.op, true);
+
+    requestAnimationFrame(() => {
+      try {
+        spawnBubbleBurst(bubble, arena);
+        launchConfetti(true, true);
+      } catch (err) {
+        console.error("Bubble effects error:", err);
+      }
+    });
+
     setTimeout(() => {
+      if (!bubbleState) return;
       bubbleState.round += 1;
       showBubbleRound();
-    }, 1050);
+    }, 850);
   } else {
     bubble.classList.add("burst-wrong");
     bubble.disabled = true;
@@ -207,10 +182,12 @@ function popBubble(bubble, value, q) {
     Sound.playWrong();
     if (isFirstMiss) Voice.cheerTryAgain();
     else Voice.cheerWrong();
+
     setTimeout(() => {
-      bubble.remove();
+      if (!bubbleState) return;
+      if (bubble.parentNode) bubble.remove();
       bubbleState.locked = false;
-    }, 550);
+    }, 400);
   }
 }
 

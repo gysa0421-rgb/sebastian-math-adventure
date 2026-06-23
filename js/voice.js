@@ -1,5 +1,6 @@
 const Voice = {
   enabled: true,
+  unlocked: false,
   player: null,
   availableCustom: [],
 
@@ -23,14 +24,24 @@ const Voice = {
     moon: "moon.m4a",
   },
 
-  async loadCustomManifest() {
+  loadCustomManifest() {
     this.availableCustom = Array.isArray(window.CUSTOM_VOICE_FILES)
       ? window.CUSTOM_VOICE_FILES
       : [];
+    return Promise.resolve();
+  },
+
+  getPlayer() {
+    if (!this.player) {
+      this.player = document.getElementById("family-voice");
+    }
+    return this.player;
   },
 
   setEnabled(on) {
     this.enabled = on;
+    const el = this.getPlayer();
+    if (!on && el) el.pause();
   },
 
   hasCustom() {
@@ -65,28 +76,38 @@ const Voice = {
     };
   },
 
-  playFile(path, onError) {
-    if (!this.enabled || !path) return;
+  unlock() {
+    const el = this.getPlayer();
+    if (!el || this.unlocked || !this.enabled || !this.hasCustom()) return;
+    this.unlocked = true;
+    el.src = this.customPath(this.availableCustom[0]);
+    el.volume = 0.01;
+    el.play().catch(() => {});
+  },
 
-    const clip = new Audio(path);
-    clip.volume = 1;
-    if (typeof Music !== "undefined") Music.duck();
+  playFile(path) {
+    const el = this.getPlayer();
+    if (!el || !this.enabled || !path) return;
+
+    const musicWasPlaying =
+      typeof Music !== "undefined" && Music.enabled && Music.isPlaying();
+    if (musicWasPlaying) Music.pause();
 
     const restoreMusic = () => {
-      if (typeof Music !== "undefined") Music.unduck();
+      el.onended = null;
+      el.onerror = null;
+      if (musicWasPlaying && typeof Music !== "undefined" && Music.enabled) {
+        Music.play();
+      }
     };
 
-    clip.addEventListener("ended", restoreMusic, { once: true });
-    clip.addEventListener("error", () => {
-      restoreMusic();
-      if (typeof onError === "function") onError();
-    }, { once: true });
-    setTimeout(restoreMusic, 4000);
-
-    clip.play().catch(() => {
-      restoreMusic();
-      if (typeof onError === "function") onError();
-    });
+    el.onended = restoreMusic;
+    el.onerror = restoreMusic;
+    el.pause();
+    el.currentTime = 0;
+    el.src = path;
+    el.volume = 1;
+    el.play().catch(restoreMusic);
   },
 
   playRandom(list) {
@@ -108,13 +129,9 @@ const Voice = {
       this.cheerWrong();
       return;
     }
-    this.playFile(this.customPath(name), () => {
-      // File listed in manifest but missing on server — don't swap to keep-going.
-      console.warn("try-again.m4a could not be played. Check audio/custom/ was pushed.");
-    });
+    this.playFile(this.customPath(name));
   },
 
-  /** First miss on a question → try again; later misses → other encouraging clips. */
   cheerWrongAttempt(attempt) {
     if (attempt <= 1) this.cheerTryAgain();
     else this.cheerWrong();
@@ -140,3 +157,5 @@ const Voice = {
     this.playFile(this.clips.moon);
   },
 };
+
+Voice.loadCustomManifest();
