@@ -1,5 +1,11 @@
 const MINIGAME_ROUNDS = 8;
-const BUBBLE_LIVES = 3;
+
+const BUBBLE_RETRY = [
+  "Try again!",
+  "Almost! Pick another bubble!",
+  "Keep going, Sebastian!",
+  "You can do it!",
+];
 
 let bubbleState = null;
 let rocketState = null;
@@ -24,7 +30,6 @@ function startBubbleGame(unlockedOps) {
   bubbleState = {
     round: 0,
     correct: 0,
-    lives: BUBBLE_LIVES,
     questions: buildQuizQuestions(ops, MINIGAME_ROUNDS),
     locked: false,
   };
@@ -37,10 +42,6 @@ function showBubbleRound() {
     endBubbleGame();
     return;
   }
-  if (bubbleState.lives <= 0) {
-    endBubbleGame();
-    return;
-  }
 
   bubbleState.locked = false;
   const q = bubbleState.questions[bubbleState.round];
@@ -48,7 +49,7 @@ function showBubbleRound() {
   document.getElementById("bubble-feedback").textContent = "";
   document.getElementById("bubble-score").textContent =
     `Score: ${bubbleState.correct} / ${MINIGAME_ROUNDS}`;
-  updateBubbleLives();
+  updateBubbleProgress();
 
   const arena = document.getElementById("bubble-arena");
   arena.innerHTML = "";
@@ -61,13 +62,109 @@ function showBubbleRound() {
 
   shuffle(values.slice(0, 5)).forEach((value, i) => {
     const bubble = document.createElement("button");
-    bubble.className = "bubble";
+    bubble.className = "game-bubble";
     bubble.textContent = value;
-    bubble.style.left = `${10 + (i % 3) * 30}%`;
-    bubble.style.top = `${15 + Math.floor(i / 3) * 35}%`;
     bubble.style.animationDelay = `${i * 0.15}s`;
     bubble.addEventListener("click", () => popBubble(bubble, value, q));
     arena.appendChild(bubble);
+  });
+}
+
+function spawnBubbleBurst(bubble, arena) {
+  const arenaRect = arena.getBoundingClientRect();
+  const bubbleRect = bubble.getBoundingClientRect();
+  const cx = bubbleRect.left + bubbleRect.width / 2 - arenaRect.left;
+  const cy = bubbleRect.top + bubbleRect.height / 2 - arenaRect.top;
+  const size = bubbleRect.width;
+  const screen = document.getElementById("screen-bubble");
+
+  const mega = document.createElement("span");
+  mega.className = "bubble-mega-burst";
+  mega.style.left = `${cx}px`;
+  mega.style.top = `${cy}px`;
+  arena.appendChild(mega);
+  setTimeout(() => mega.remove(), 900);
+
+  const bigCheer = document.createElement("span");
+  bigCheer.className = "bubble-celebration mega";
+  bigCheer.textContent = "🎉";
+  bigCheer.style.left = `${cx}px`;
+  bigCheer.style.top = `${cy}px`;
+  arena.appendChild(bigCheer);
+  setTimeout(() => bigCheer.remove(), 1050);
+
+  for (let r = 0; r < 5; r++) {
+    const ripple = document.createElement("span");
+    ripple.className = "bubble-ripple";
+    ripple.style.left = `${cx}px`;
+    ripple.style.top = `${cy}px`;
+    ripple.style.width = `${size}px`;
+    ripple.style.height = `${size}px`;
+    ripple.style.animationDelay = `${r * 0.06}s`;
+    arena.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 950);
+  }
+
+  for (let i = 0; i < 30; i++) {
+    const spark = document.createElement("span");
+    spark.className = "bubble-gold-spark";
+    const angle = (Math.PI * 2 * i) / 30 + randomInt(-10, 10) * 0.01;
+    const dist = randomInt(70, 150);
+    const rot = (angle * 180) / Math.PI;
+    spark.style.left = `${cx}px`;
+    spark.style.top = `${cy}px`;
+    spark.style.setProperty("--rot", `${rot}deg`);
+    spark.style.setProperty("--len", `${randomInt(14, 32)}px`);
+    spark.style.setProperty("--thick", `${randomInt(3, 5)}px`);
+    spark.style.setProperty("--dx", `${Math.cos(angle) * dist}px`);
+    spark.style.setProperty("--dy", `${Math.sin(angle) * dist}px`);
+    spark.style.animationDelay = `${randomInt(0, 80)}ms`;
+    arena.appendChild(spark);
+    setTimeout(() => spark.remove(), 900);
+  }
+
+  for (let i = 0; i < 20; i++) {
+    const dot = document.createElement("span");
+    dot.className = "bubble-gold-dot";
+    const angle = randomInt(0, 360) * (Math.PI / 180);
+    const dist = randomInt(45, 120);
+    const dotSize = randomInt(6, 14);
+    dot.style.left = `${cx}px`;
+    dot.style.top = `${cy}px`;
+    dot.style.width = `${dotSize}px`;
+    dot.style.height = `${dotSize}px`;
+    dot.style.setProperty("--dx", `${Math.cos(angle) * dist}px`);
+    dot.style.setProperty("--dy", `${Math.sin(angle) * dist}px`);
+    dot.style.animationDelay = `${randomInt(0, 100)}ms`;
+    arena.appendChild(dot);
+    setTimeout(() => dot.remove(), 850);
+  }
+
+  const celebrationEmojis = ["✨", "⭐", "🌟", "🎉", "🎊"];
+  for (let i = 0; i < 14; i++) {
+    const cheer = document.createElement("span");
+    cheer.className = "bubble-celebration";
+    cheer.textContent = pickRandom(celebrationEmojis);
+    const angle = randomInt(0, 360) * (Math.PI / 180);
+    const dist = randomInt(40, 100);
+    cheer.style.left = `${cx}px`;
+    cheer.style.top = `${cy}px`;
+    cheer.style.setProperty("--dx", `${Math.cos(angle) * dist}px`);
+    cheer.style.setProperty("--dy", `${Math.sin(angle) * dist}px`);
+    cheer.style.animationDelay = `${i * 30}ms`;
+    arena.appendChild(cheer);
+    setTimeout(() => cheer.remove(), 1000);
+  }
+
+  arena.classList.add("burst-flash", "shake");
+  if (screen) screen.classList.add("celebrate");
+  setTimeout(() => {
+    arena.classList.remove("burst-flash", "shake");
+    if (screen) screen.classList.remove("celebrate");
+  }, 650);
+
+  arena.querySelectorAll(".game-bubble:not(.pop)").forEach((b) => {
+    b.classList.add("fade-away");
   });
 }
 
@@ -81,38 +178,38 @@ function popBubble(bubble, value, q) {
   if (value === q.answer) {
     bubbleState.correct += 1;
     bubble.classList.add("pop");
+    spawnBubbleBurst(bubble, arena);
+    const questionEl = document.getElementById("bubble-question");
+    questionEl.classList.remove("pop-success");
+    void questionEl.offsetWidth;
+    questionEl.classList.add("pop-success");
     feedback.textContent = pickRandom(ENCOURAGEMENTS);
     feedback.className = "feedback bounce happy";
     Sound.playBubblePop();
     Voice.cheerBubblePop();
-    launchStarBurst();
+    launchConfetti(true, true);
     recordAnswer(loadProgress(), q.op, true);
     setTimeout(() => {
       bubbleState.round += 1;
       showBubbleRound();
-    }, 700);
+    }, 1050);
   } else {
-    bubbleState.lives -= 1;
     bubble.classList.add("burst-wrong");
-    feedback.textContent = `Oops! It was ${q.answer}.`;
-    feedback.className = "feedback gentle";
+    bubble.disabled = true;
+    feedback.textContent = pickRandom(BUBBLE_RETRY);
+    feedback.className = "feedback gentle bounce";
     Sound.playWrong();
-    Voice.cheerWrong();
-    recordAnswer(loadProgress(), q.op, false);
-    arena.querySelectorAll(".bubble").forEach((b) => {
-      b.disabled = true;
-      if (Number(b.textContent) === q.answer) b.classList.add("highlight");
-    });
+    Voice.cheerTryAgain();
     setTimeout(() => {
-      bubbleState.round += 1;
-      showBubbleRound();
-    }, 1200);
+      bubble.remove();
+      bubbleState.locked = false;
+    }, 550);
   }
 }
 
-function updateBubbleLives() {
-  const hearts = "❤️ ".repeat(bubbleState.lives).trim() || "💔";
-  document.getElementById("bubble-lives").textContent = hearts;
+function updateBubbleProgress() {
+  document.getElementById("bubble-lives").textContent =
+    `Round ${bubbleState.round + 1} of ${MINIGAME_ROUNDS}`;
 }
 
 function endBubbleGame() {

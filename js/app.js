@@ -19,9 +19,12 @@ window.showScreen = showScreen;
 
 function syncSoundToggle() {
   const btn = document.getElementById("sound-toggle");
+  const musicBtn = document.getElementById("music-toggle");
   Sound.setEnabled(progress.soundEnabled);
   Voice.setEnabled(progress.soundEnabled);
+  Music.setEnabled(progress.musicEnabled);
   btn.textContent = progress.soundEnabled ? "🔊 Sound & Voice On" : "🔇 Sound & Voice Off";
+  musicBtn.textContent = progress.musicEnabled ? "🎵 Music On" : "🔇 Music Off";
 }
 
 function refreshHome() {
@@ -47,6 +50,7 @@ function renderSkillGrid() {
     if (mastered) btn.classList.add("mastered");
     btn.disabled = !unlocked;
     btn.addEventListener("click", () => {
+      unlockAllAudio();
       Sound.playClick();
       startPractice(op);
     });
@@ -274,6 +278,7 @@ function navigate(target) {
 
 document.querySelectorAll("[data-go]").forEach((el) => {
   el.addEventListener("click", () => {
+    unlockAllAudio();
     Sound.playClick();
     navigate(el.dataset.go);
   });
@@ -283,8 +288,25 @@ document.getElementById("sound-toggle").addEventListener("click", () => {
   progress.soundEnabled = !progress.soundEnabled;
   saveProgress(progress);
   syncSoundToggle();
+  unlockAllAudio();
   if (progress.soundEnabled) Sound.playClick();
 });
+
+document.getElementById("music-toggle").addEventListener("click", () => {
+  progress.musicEnabled = !progress.musicEnabled;
+  saveProgress(progress);
+  syncSoundToggle();
+  unlockAllAudio();
+  if (progress.musicEnabled) Music.play();
+});
+
+function unlockAllAudio() {
+  Sound.init();
+  if (progress.musicEnabled) Music.play();
+}
+
+document.body.addEventListener("touchend", unlockAllAudio, { passive: true });
+document.body.addEventListener("click", unlockAllAudio);
 
 document.getElementById("next-btn").addEventListener("click", () => {
   Sound.playClick();
@@ -309,13 +331,8 @@ initMinigames(finishMinigame);
 
 async function bootVoice() {
   await Voice.loadCustomManifest();
+  Music.init();
   refreshHome();
 }
-
-document.body.addEventListener(
-  "click",
-  () => Sound.init(),
-  { once: true }
-);
 
 bootVoice();

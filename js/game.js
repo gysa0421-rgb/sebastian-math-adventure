@@ -142,18 +142,31 @@ function renderHint(q) {
   }
 }
 
-function launchConfetti(big = false) {
+function launchConfetti(big = false, gold = false) {
   const container = document.getElementById("confetti");
-  const colors = ["#38bdf8", "#2563eb", "#fbbf24", "#34d399", "#22d3ee"];
-  const count = big ? 40 : 24;
+  const colors = gold
+    ? ["#fbbf24", "#f59e0b", "#fde68a", "#fff7ed", "#fcd34d", "#f97316", "#fff"]
+    : ["#38bdf8", "#2563eb", "#fbbf24", "#34d399", "#22d3ee"];
+  const count = big ? (gold ? 55 : 40) : 24;
+  const emojis = gold ? ["✨", "⭐", "🎉", "🌟"] : null;
   for (let i = 0; i < count; i++) {
     const piece = document.createElement("span");
     piece.style.left = `${randomInt(0, 100)}%`;
-    piece.style.background = pickRandom(colors);
-    piece.style.animationDelay = `${randomInt(0, 400)}ms`;
-    if (big) piece.style.width = "14px";
+    if (emojis && i % 4 === 0) {
+      piece.textContent = pickRandom(emojis);
+      piece.style.background = "transparent";
+      piece.style.width = "auto";
+      piece.style.height = "auto";
+      piece.style.fontSize = big ? "1.4rem" : "1.1rem";
+      piece.style.borderRadius = "0";
+    } else {
+      piece.style.background = pickRandom(colors);
+    }
+    piece.style.animationDelay = `${randomInt(0, 500)}ms`;
+    if (big) piece.style.width = piece.style.width || "14px";
+    if (big && !piece.textContent) piece.style.height = "16px";
     container.appendChild(piece);
-    setTimeout(() => piece.remove(), 1800);
+    setTimeout(() => piece.remove(), 2000);
   }
 }
 

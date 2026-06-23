@@ -145,6 +145,7 @@ body {
   display: flex;
   align-items: center;
   gap: 16px;
+  position: relative;
   width: 100%;
   border: none;
   border-radius: var(--radius);
@@ -154,6 +155,7 @@ body {
   background: var(--card);
   box-shadow: var(--shadow);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  animation: none;
 }
 
 .menu-btn:active {
@@ -162,22 +164,32 @@ body {
 
 .menu-btn.practice { border-left: 6px solid var(--accent); }
 .menu-btn.quiz { border-left: 6px solid var(--accent-dark); }
-.menu-btn.bubble { border-left: 6px solid #38bdf8; }
+.menu-btn.bubble-game { border-left: 6px solid #38bdf8; }
 .menu-btn.rocket-game { border-left: 6px solid #f59e0b; }
 
 .games-section-title {
-  margin: 22px 0 12px;
+  margin: 28px 0 16px;
+  padding-top: 8px;
   text-align: center;
   color: var(--accent-dark);
   font-size: 1.15rem;
 }
 
 .games-menu {
-  margin-bottom: 8px;
+  display: grid;
+  gap: 14px;
+  margin-bottom: 28px;
 }
 
 .menu-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
   font-size: 2rem;
+  line-height: 1;
 }
 
 .menu-text strong {
@@ -278,7 +290,8 @@ body {
   gap: 10px;
 }
 
-.sound-toggle {
+.sound-toggle,
+.music-toggle {
   border: none;
   background: transparent;
   font-family: inherit;
@@ -286,6 +299,11 @@ body {
   color: var(--muted);
   cursor: pointer;
   padding: 8px;
+}
+
+.music-toggle {
+  color: var(--accent-dark);
+  font-weight: 600;
 }
 
 .streak-badge.on-fire {
@@ -503,7 +521,9 @@ body {
 
 .family-photo-wrap {
   text-align: center;
-  margin: 20px 0 8px;
+  margin: 8px 0 16px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(37, 99, 235, 0.12);
 }
 
 .family-photo {
@@ -570,35 +590,90 @@ body {
 
 .bubble-arena {
   position: relative;
-  height: 280px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 280px;
+  padding: 24px 16px;
   background: linear-gradient(180deg, #e0f2fe 0%, #dbeafe 100%);
   border-radius: 24px;
-  overflow: hidden;
   box-shadow: var(--shadow);
   margin-bottom: 12px;
+  overflow: visible;
 }
 
-.bubble {
-  position: absolute;
-  width: 64px;
-  height: 64px;
+.bubble-arena.burst-flash {
+  animation: arenaGoldFlash 0.65s ease;
+}
+
+.bubble-arena.shake {
+  animation: arenaShake 0.55s ease;
+}
+
+#screen-bubble.celebrate {
+  animation: screenCelebrate 0.6s ease;
+}
+
+@keyframes arenaGoldFlash {
+  0%, 100% { box-shadow: var(--shadow); filter: brightness(1); }
+  25% {
+    box-shadow:
+      0 0 50px rgba(251, 191, 36, 0.85),
+      0 0 24px rgba(245, 158, 11, 0.55),
+      inset 0 0 40px rgba(251, 191, 36, 0.25),
+      var(--shadow);
+    filter: brightness(1.25) saturate(1.3);
+  }
+}
+
+@keyframes arenaShake {
+  0%, 100% { transform: translate(0, 0); }
+  12% { transform: translate(-5px, 3px) rotate(-0.5deg); }
+  28% { transform: translate(6px, -4px) rotate(0.5deg); }
+  44% { transform: translate(-4px, -3px); }
+  60% { transform: translate(4px, 2px); }
+  76% { transform: translate(-2px, 1px); }
+}
+
+@keyframes screenCelebrate {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-3px, 0); }
+  40% { transform: translate(3px, 0); }
+  60% { transform: translate(-2px, 0); }
+}
+
+.bubble-arena .game-bubble {
+  position: relative;
+  flex: 0 0 68px;
+  width: 68px;
+  height: 68px;
   border: none;
   border-radius: 50%;
   font-family: inherit;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: white;
   cursor: pointer;
   background: radial-gradient(circle at 30% 30%, #7dd3fc, #38bdf8 50%, #0284c7);
-  box-shadow: inset -4px -4px 10px rgba(0,0,0,0.1), 0 6px 16px rgba(56, 189, 248, 0.4);
+  box-shadow:
+    inset -4px -4px 10px rgba(0, 0, 0, 0.1),
+    inset 8px 8px 14px rgba(255, 255, 255, 0.35),
+    0 6px 16px rgba(56, 189, 248, 0.4);
   animation: bubbleFloat 2.5s ease-in-out infinite alternate;
+  transition: transform 0.12s ease;
 }
 
-.bubble:nth-child(2n) {
+.bubble-arena .game-bubble:active:not(.pop):not(.burst-wrong) {
+  transform: scale(0.92);
+}
+
+.bubble-arena .game-bubble:nth-child(2n) {
   background: radial-gradient(circle at 30% 30%, #93c5fd, #3b82f6 50%, #1d4ed8);
 }
 
-.bubble:nth-child(3n) {
+.bubble-arena .game-bubble:nth-child(3n) {
   background: radial-gradient(circle at 30% 30%, #67e8f9, #06b6d4 50%, #0891b2);
 }
 
@@ -607,22 +682,173 @@ body {
   to { transform: translateY(-12px) scale(1.05); }
 }
 
-.bubble.pop {
-  animation: bubblePop 0.5s ease forwards;
+.bubble-arena .game-bubble.pop {
+  animation: bubblePopBurst 0.75s cubic-bezier(0.18, 1.25, 0.32, 1) forwards;
+  z-index: 5;
+  pointer-events: none;
 }
 
-.bubble.burst-wrong {
-  animation: bubbleShake 0.4s ease;
-  opacity: 0.5;
+.bubble-arena .game-bubble.fade-away {
+  animation: bubbleFadeAway 0.45s ease forwards;
+  pointer-events: none;
 }
 
-.bubble.highlight {
+.bubble-arena .game-bubble.burst-wrong {
+  animation: bubbleBurstWrong 0.55s ease forwards;
+  pointer-events: none;
+}
+
+.bubble-arena .game-bubble.highlight {
   outline: 4px solid var(--green);
   outline-offset: 2px;
+  animation: bubblePulseCorrect 0.8s ease infinite alternate;
 }
 
-@keyframes bubblePop {
-  to { transform: scale(1.6); opacity: 0; }
+.bubble-ripple {
+  position: absolute;
+  border-radius: 50%;
+  border: 4px solid rgba(251, 191, 36, 0.9);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: bubbleRipple 0.85s ease-out forwards;
+  box-shadow: 0 0 18px rgba(251, 191, 36, 0.6);
+}
+
+.bubble-mega-burst {
+  position: absolute;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 251, 235, 0.98) 0%,
+    rgba(251, 191, 36, 0.75) 22%,
+    rgba(245, 158, 11, 0.45) 45%,
+    transparent 68%
+  );
+  animation: megaBurst 0.8s ease-out forwards;
+  z-index: 4;
+}
+
+.bubble-gold-spark {
+  position: absolute;
+  pointer-events: none;
+  transform: translate(-50%, -50%) rotate(var(--rot));
+  width: var(--len);
+  height: var(--thick);
+  border-radius: 999px;
+  background: linear-gradient(90deg, #fffbeb, #fde68a 30%, #fbbf24 70%, #f59e0b);
+  box-shadow: 0 0 8px #fbbf24, 0 0 18px rgba(251, 191, 36, 0.65);
+  animation: goldSparkFly 0.85s cubic-bezier(0.12, 0.95, 0.2, 1) forwards;
+  z-index: 6;
+}
+
+.bubble-gold-dot {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, #fff 0%, #fde68a 35%, #f59e0b 100%);
+  box-shadow: 0 0 10px #fbbf24, 0 0 6px #fff;
+  animation: goldDotFly 0.8s ease-out forwards;
+  z-index: 6;
+}
+
+.bubble-celebration {
+  position: absolute;
+  font-size: 1.4rem;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.95));
+  animation: celebrationPop 0.95s cubic-bezier(0.2, 1.1, 0.3, 1) forwards;
+  z-index: 7;
+}
+
+.bubble-celebration.mega {
+  font-size: 3.2rem;
+  z-index: 12;
+  filter: drop-shadow(0 0 14px rgba(251, 191, 36, 1)) drop-shadow(0 0 6px #fff);
+  animation: megaCelebration 1s cubic-bezier(0.15, 1.35, 0.3, 1) forwards;
+}
+
+.bubble-question.pop-success {
+  animation: questionPop 0.45s ease;
+}
+
+@keyframes bubblePopBurst {
+  0% { transform: scale(1); opacity: 1; filter: brightness(1); }
+  10% { transform: scale(0.72); opacity: 1; filter: brightness(1.15); }
+  22% { transform: scale(1.65); opacity: 1; filter: brightness(1.8) sepia(0.35); }
+  45% { transform: scale(2.3); opacity: 0.85; filter: brightness(2.1) sepia(0.5); }
+  100% { transform: scale(3.4); opacity: 0; filter: brightness(2.5) sepia(0.6); }
+}
+
+@keyframes bubbleFadeAway {
+  to { transform: scale(0.55); opacity: 0.15; filter: blur(1px); }
+}
+
+@keyframes bubbleBurstWrong {
+  0% { transform: scale(1); opacity: 1; }
+  20% { transform: scale(1.15); background: radial-gradient(circle at 30% 30%, #fca5a5, #f87171 50%, #dc2626); }
+  100% { transform: scale(0.3); opacity: 0; }
+}
+
+@keyframes bubblePulseCorrect {
+  from { transform: scale(1); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.5); }
+  to { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(52, 211, 153, 0); }
+}
+
+@keyframes bubbleRipple {
+  from { transform: translate(-50%, -50%) scale(0.3); opacity: 1; }
+  to { transform: translate(-50%, -50%) scale(4.8); opacity: 0; }
+}
+
+@keyframes megaBurst {
+  0% { width: 16px; height: 16px; opacity: 1; }
+  35% { opacity: 0.95; }
+  100% { width: 320px; height: 320px; opacity: 0; }
+}
+
+@keyframes megaCelebration {
+  0% { transform: translate(-50%, -50%) scale(0) rotate(-25deg); opacity: 0; }
+  18% { transform: translate(-50%, -50%) scale(1.8) rotate(8deg); opacity: 1; }
+  45% { transform: translate(-50%, -50%) scale(1.5) rotate(-5deg); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(2.6) rotate(18deg); opacity: 0; }
+}
+
+@keyframes goldSparkFly {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--rot)) scaleX(0.1);
+    opacity: 1;
+  }
+  30% { opacity: 1; }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--rot)) scaleX(1.2);
+    opacity: 0;
+  }
+}
+
+@keyframes goldDotFly {
+  0% { transform: translate(-50%, -50%) scale(0.1); opacity: 1; }
+  20% { transform: translate(-50%, -50%) scale(1.6); opacity: 1; }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.2);
+    opacity: 0;
+  }
+}
+
+@keyframes celebrationPop {
+  0% { transform: translate(-50%, -50%) scale(0.15) rotate(-25deg); opacity: 0; }
+  22% { transform: translate(-50%, -50%) scale(1.5) rotate(10deg); opacity: 1; }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.7) rotate(30deg);
+    opacity: 0;
+  }
+}
+
+@keyframes questionPop {
+  0%, 100% { transform: scale(1); }
+  35% { transform: scale(1.14); color: #d97706; text-shadow: 0 0 12px rgba(251, 191, 36, 0.6); }
 }
 
 @keyframes bubbleShake {

@@ -18,6 +18,7 @@ window.CUSTOM_VOICE_FILES = [
   "rocket-power.m4a",
   "super-job.m4a",
   "thats-right.m4a",
+  "try-again.m4a",
   "unlocked.m4a",
   "wow-champion.m4a",
   "you-got-it.m4a",

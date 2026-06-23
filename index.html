@@ -56,7 +56,7 @@
 
       <h3 class="games-section-title">🎮 Fun Games</h3>
       <div class="menu games-menu">
-        <button class="menu-btn bubble" id="start-bubble-btn" type="button">
+        <button class="menu-btn bubble-game" id="start-bubble-btn" type="button">
           <span class="menu-icon">🫧</span>
           <span class="menu-text">
             <strong>Bubble Pop</strong>
@@ -78,6 +78,7 @@
       </div>
 
       <div class="home-footer">
+        <button id="music-toggle" class="music-toggle" type="button">🎵 Music On</button>
         <button id="sound-toggle" class="sound-toggle" type="button">🔊 Sound & Voice On</button>
       </div>
     </section>
@@ -138,7 +139,7 @@
         <button class="back-btn" data-go="home" id="bubble-back">← Back</button>
         <h2>Bubble Pop</h2>
       </header>
-      <div class="lives-bar" id="bubble-lives">❤️ ❤️ ❤️</div>
+      <div class="lives-bar" id="bubble-lives">Round 1 of 8</div>
       <p class="bubble-prompt">Pop the bubble with the answer!</p>
       <p id="bubble-question" class="bubble-question">36 ÷ 4 = ?</p>
       <div id="bubble-arena" class="bubble-arena"></div>
@@ -173,8 +174,13 @@
 
   <div id="confetti" class="confetti" aria-hidden="true"></div>
 
+  <audio id="bg-music" loop preload="auto" playsinline webkit-playsinline>
+    <source src="audio/music/background.mp3" type="audio/mpeg" />
+  </audio>
+
   <script src="js/storage.js"></script>
   <script src="js/sounds.js"></script>
+  <script src="js/music.js"></script>
   <script src="js/custom-manifest.js"></script>
   <script src="js/voice.js"></script>
   <script src="js/game.js"></script>

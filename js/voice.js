@@ -15,6 +15,7 @@ const Voice = {
       "you-got-it.m4a",
     ],
     wrong: ["nice-try.m4a", "keep-going.m4a", "almost.m4a"],
+    tryAgain: ["try-again.m4a", "keep-going.m4a", "almost.m4a"],
     win: ["incredible.m4a", "wow-champion.m4a", "super-job.m4a"],
     bubble: ["pop-good.m4a", "nice-pop.m4a", "bubble-great.m4a"],
     rocket: ["fuel-up.m4a", "go-go.m4a", "rocket-power.m4a"],
@@ -30,7 +31,6 @@ const Voice = {
 
   setEnabled(on) {
     this.enabled = on;
-    if (!on && this.player) this.player.pause();
   },
 
   hasCustom() {
@@ -56,6 +56,7 @@ const Voice = {
     return {
       correct: this.clipsForCategory("correct"),
       wrong: this.clipsForCategory("wrong"),
+      tryAgain: this.clipsForCategory("tryAgain"),
       win: this.clipsForCategory("win"),
       bubble: this.clipsForCategory("bubble"),
       rocket: this.clipsForCategory("rocket"),
@@ -67,14 +68,19 @@ const Voice = {
   playFile(path) {
     if (!this.enabled || !path) return;
 
-    if (this.player) {
-      this.player.pause();
-      this.player.currentTime = 0;
-    }
+    const clip = new Audio(path);
+    clip.volume = 1;
+    if (typeof Music !== "undefined") Music.duck();
 
-    this.player = new Audio(path);
-    this.player.volume = 0.95;
-    this.player.play().catch(() => {});
+    const restoreMusic = () => {
+      if (typeof Music !== "undefined") Music.unduck();
+    };
+
+    clip.addEventListener("ended", restoreMusic, { once: true });
+    clip.addEventListener("error", restoreMusic, { once: true });
+    setTimeout(restoreMusic, 4000);
+
+    clip.play().catch(restoreMusic);
   },
 
   playRandom(list) {
@@ -88,6 +94,10 @@ const Voice = {
 
   cheerWrong() {
     this.playRandom(this.clips.wrong);
+  },
+
+  cheerTryAgain() {
+    this.playRandom(this.clips.tryAgain);
   },
 
   cheerWin() {

@@ -17,6 +17,7 @@ const DEFAULT_PROGRESS = {
   opStats: {},
   roundsPlayed: 0,
   soundEnabled: true,
+  musicEnabled: true,
   voiceMode: "custom",
 };
 
