@@ -199,10 +199,14 @@ function popBubble(bubble, value, q) {
     bubble.classList.add("burst-wrong");
     bubble.disabled = true;
     bubbleState.wrongThisRound += 1;
-    feedback.textContent = pickRandom(BUBBLE_RETRY);
+    const isFirstMiss = bubbleState.wrongThisRound === 1;
+    feedback.textContent = isFirstMiss
+      ? BUBBLE_RETRY_FIRST
+      : pickRandom(BUBBLE_RETRY_MORE);
     feedback.className = "feedback gentle bounce";
     Sound.playWrong();
-    Voice.cheerWrongAttempt(bubbleState.wrongThisRound);
+    if (isFirstMiss) Voice.cheerTryAgain();
+    else Voice.cheerWrong();
     setTimeout(() => {
       bubble.remove();
       bubbleState.locked = false;
