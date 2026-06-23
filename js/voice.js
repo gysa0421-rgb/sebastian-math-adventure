@@ -15,7 +15,7 @@ const Voice = {
       "you-got-it.m4a",
     ],
     wrong: ["nice-try.m4a", "keep-going.m4a", "almost.m4a"],
-    tryAgain: ["try-again.m4a", "keep-going.m4a", "almost.m4a"],
+    tryAgain: ["try-again.m4a"],
     win: ["incredible.m4a", "wow-champion.m4a", "super-job.m4a"],
     bubble: ["pop-good.m4a", "nice-pop.m4a", "bubble-great.m4a"],
     rocket: ["fuel-up.m4a", "go-go.m4a", "rocket-power.m4a"],
@@ -97,7 +97,17 @@ const Voice = {
   },
 
   cheerTryAgain() {
-    this.playRandom(this.clips.tryAgain);
+    if (this.availableCustom.includes("try-again.m4a")) {
+      this.playFile(this.customPath("try-again.m4a"));
+      return;
+    }
+    this.cheerWrong();
+  },
+
+  /** First miss on a question → try again; later misses → other encouraging clips. */
+  cheerWrongAttempt(attempt) {
+    if (attempt <= 1) this.cheerTryAgain();
+    else this.cheerWrong();
   },
 
   cheerWin() {

@@ -44,6 +44,7 @@ function showBubbleRound() {
   }
 
   bubbleState.locked = false;
+  bubbleState.wrongThisRound = 0;
   const q = bubbleState.questions[bubbleState.round];
   document.getElementById("bubble-question").textContent = questionText(q);
   document.getElementById("bubble-feedback").textContent = "";
@@ -196,10 +197,11 @@ function popBubble(bubble, value, q) {
   } else {
     bubble.classList.add("burst-wrong");
     bubble.disabled = true;
+    bubbleState.wrongThisRound += 1;
     feedback.textContent = pickRandom(BUBBLE_RETRY);
     feedback.className = "feedback gentle bounce";
     Sound.playWrong();
-    Voice.cheerTryAgain();
+    Voice.cheerWrongAttempt(bubbleState.wrongThisRound);
     setTimeout(() => {
       bubble.remove();
       bubbleState.locked = false;
@@ -292,7 +294,7 @@ function handleRocketAnswer(btn, chosen, q) {
     feedback.textContent = `Not enough fuel! Answer: ${q.answer}`;
     feedback.className = "feedback gentle";
     Sound.playWrong();
-    Voice.cheerWrong();
+    Voice.cheerWrongAttempt(1);
     recordAnswer(loadProgress(), q.op, false);
   }
 

@@ -152,7 +152,7 @@ function handleAnswer(btn, chosen, answer, opForStats) {
     feedback.textContent = `${pickRandom(GENTLE_WRONG)} ${answer}.`;
     feedback.classList.add("gentle");
     Sound.playWrong();
-    Voice.cheerWrong();
+    Voice.cheerWrongAttempt(1);
     recordAnswer(progress, statsOp, false);
   }
 
