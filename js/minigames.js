@@ -1,9 +1,9 @@
 const MINIGAME_ROUNDS = 8;
 
-const BUBBLE_RETRY = [
-  "Try again!",
+const BUBBLE_RETRY_FIRST = "Try again, Sebastian!";
+const BUBBLE_RETRY_MORE = [
   "Almost! Pick another bubble!",
-  "Keep going, Sebastian!",
+  "Keep going!",
   "You can do it!",
 ];
 
@@ -30,6 +30,7 @@ function startBubbleGame(unlockedOps) {
   bubbleState = {
     round: 0,
     correct: 0,
+    wrongThisRound: 0,
     questions: buildQuizQuestions(ops, MINIGAME_ROUNDS),
     locked: false,
   };

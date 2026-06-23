@@ -65,7 +65,7 @@ const Voice = {
     };
   },
 
-  playFile(path) {
+  playFile(path, onError) {
     if (!this.enabled || !path) return;
 
     const clip = new Audio(path);
@@ -77,10 +77,16 @@ const Voice = {
     };
 
     clip.addEventListener("ended", restoreMusic, { once: true });
-    clip.addEventListener("error", restoreMusic, { once: true });
+    clip.addEventListener("error", () => {
+      restoreMusic();
+      if (typeof onError === "function") onError();
+    }, { once: true });
     setTimeout(restoreMusic, 4000);
 
-    clip.play().catch(restoreMusic);
+    clip.play().catch(() => {
+      restoreMusic();
+      if (typeof onError === "function") onError();
+    });
   },
 
   playRandom(list) {
@@ -97,11 +103,15 @@ const Voice = {
   },
 
   cheerTryAgain() {
-    if (this.availableCustom.includes("try-again.m4a")) {
-      this.playFile(this.customPath("try-again.m4a"));
+    const name = "try-again.m4a";
+    if (!this.availableCustom.includes(name)) {
+      this.cheerWrong();
       return;
     }
-    this.cheerWrong();
+    this.playFile(this.customPath(name), () => {
+      // File listed in manifest but missing on server — don't swap to keep-going.
+      console.warn("try-again.m4a could not be played. Check audio/custom/ was pushed.");
+    });
   },
 
   /** First miss on a question → try again; later misses → other encouraging clips. */
