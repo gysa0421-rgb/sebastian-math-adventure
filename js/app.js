@@ -20,6 +20,7 @@ window.showScreen = showScreen;
 function syncSoundToggle() {
   const btn = document.getElementById("sound-toggle");
   const musicBtn = document.getElementById("music-toggle");
+  if (!btn || !musicBtn) return;
   Sound.setEnabled(progress.soundEnabled);
   Voice.setEnabled(progress.soundEnabled);
   Music.setEnabled(progress.musicEnabled);
@@ -284,7 +285,7 @@ document.querySelectorAll("[data-go]").forEach((el) => {
   });
 });
 
-document.getElementById("sound-toggle").addEventListener("click", () => {
+document.getElementById("sound-toggle")?.addEventListener("click", () => {
   progress.soundEnabled = !progress.soundEnabled;
   saveProgress(progress);
   syncSoundToggle();
@@ -292,7 +293,7 @@ document.getElementById("sound-toggle").addEventListener("click", () => {
   if (progress.soundEnabled) Sound.playClick();
 });
 
-document.getElementById("music-toggle").addEventListener("click", () => {
+document.getElementById("music-toggle")?.addEventListener("click", () => {
   progress.musicEnabled = !progress.musicEnabled;
   saveProgress(progress);
   syncSoundToggle();
@@ -330,9 +331,14 @@ document.getElementById("play-again-btn").addEventListener("click", () => {
 initMinigames(finishMinigame);
 
 async function bootVoice() {
-  await Voice.loadCustomManifest();
-  Music.init();
-  refreshHome();
+  try {
+    await Voice.loadCustomManifest();
+    Music.init();
+    refreshHome();
+  } catch (err) {
+    console.error("Boot failed:", err);
+    refreshHome();
+  }
 }
 
 bootVoice();

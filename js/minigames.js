@@ -14,12 +14,12 @@ let onMinigameComplete = null;
 function initMinigames(completeCallback) {
   onMinigameComplete = completeCallback;
 
-  document.getElementById("start-bubble-btn").addEventListener("click", () => {
+  document.getElementById("start-bubble-btn")?.addEventListener("click", () => {
     Sound.playClick();
     startBubbleGame();
   });
 
-  document.getElementById("start-rocket-btn").addEventListener("click", () => {
+  document.getElementById("start-rocket-btn")?.addEventListener("click", () => {
     Sound.playClick();
     startRocketGame();
   });
@@ -95,7 +95,7 @@ function spawnBubbleBurst(bubble, arena) {
   arena.appendChild(bigCheer);
   setTimeout(() => bigCheer.remove(), 1050);
 
-  for (let r = 0; r < 5; r++) {
+  for (let r = 0; r < 3; r++) {
     const ripple = document.createElement("span");
     ripple.className = "bubble-ripple";
     ripple.style.left = `${cx}px`;
@@ -107,10 +107,10 @@ function spawnBubbleBurst(bubble, arena) {
     setTimeout(() => ripple.remove(), 950);
   }
 
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 16; i++) {
     const spark = document.createElement("span");
     spark.className = "bubble-gold-spark";
-    const angle = (Math.PI * 2 * i) / 30 + randomInt(-10, 10) * 0.01;
+    const angle = (Math.PI * 2 * i) / 16 + randomInt(-10, 10) * 0.01;
     const dist = randomInt(70, 150);
     const rot = (angle * 180) / Math.PI;
     spark.style.left = `${cx}px`;
@@ -125,7 +125,7 @@ function spawnBubbleBurst(bubble, arena) {
     setTimeout(() => spark.remove(), 900);
   }
 
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 10; i++) {
     const dot = document.createElement("span");
     dot.className = "bubble-gold-dot";
     const angle = randomInt(0, 360) * (Math.PI / 180);
@@ -143,7 +143,7 @@ function spawnBubbleBurst(bubble, arena) {
   }
 
   const celebrationEmojis = ["✨", "⭐", "🌟", "🎉", "🎊"];
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < 6; i++) {
     const cheer = document.createElement("span");
     cheer.className = "bubble-celebration";
     cheer.textContent = pickRandom(celebrationEmojis);

@@ -144,10 +144,11 @@ function renderHint(q) {
 
 function launchConfetti(big = false, gold = false) {
   const container = document.getElementById("confetti");
+  if (!container) return;
   const colors = gold
     ? ["#fbbf24", "#f59e0b", "#fde68a", "#fff7ed", "#fcd34d", "#f97316", "#fff"]
     : ["#38bdf8", "#2563eb", "#fbbf24", "#34d399", "#22d3ee"];
-  const count = big ? (gold ? 55 : 40) : 24;
+  const count = big ? (gold ? 32 : 28) : 18;
   const emojis = gold ? ["✨", "⭐", "🎉", "🌟"] : null;
   for (let i = 0; i < count; i++) {
     const piece = document.createElement("span");
